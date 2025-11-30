@@ -102,18 +102,18 @@ for col in ("sales","profit_per_order","quantity"):
 # Dashboard header & top KPIs
 # ----------------------
 st.title("📊 Order Delay Analysis Dashboard")
-st.markdown("**Delay labeling:** `-1 = delayed`, `0 = on-time`, `1 = early`")
+st.markdown("**Delay labeling:** `1 = delayed`, `0 = on-time`, `-1 = early`")
 
 total_orders = len(work)
-delayed_count = int((work["label"] == -1).sum()) if "label" in work.columns else 0
+delayed_count = int((work["label"] == 1).sum()) if "label" in work.columns else 0
 ontime_count = int((work["label"] == 0).sum()) if "label" in work.columns else 0
-early_count = int((work["label"] == 1).sum()) if "label" in work.columns else 0
+early_count = int((work["label"] == -1).sum()) if "label" in work.columns else 0
 
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("Total orders", f"{total_orders:,}")
-k2.metric("Delayed orders (label=-1)", f"{delayed_count:,}")
+k2.metric("Delayed orders (label=1)", f"{delayed_count:,}")
 k3.metric("On-time orders (label=0)", f"{ontime_count:,}")
-k4.metric("Early deliveries (label=1)", f"{early_count:,}")
+k4.metric("Early deliveries (label=-1)", f"{early_count:,}")
 
 st.markdown("---")
 
@@ -243,11 +243,11 @@ st.markdown("---")
 # ----------------------
 # Delay analysis: counts and percentages
 # ----------------------
-st.header("Delay Analysis (label = -1 → delayed)")
+st.header("Delay Analysis (label = 1 → delayed)")
 
 # Delay by shipping_mode
 if "shipping_mode" in filtered.columns and "label" in filtered.columns:
-    delay_by_ship = filtered[filtered["label"] == -1].groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="delay_count")
+    delay_by_ship = filtered[filtered["label"] == 1].groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="delay_count")
     total_by_ship = filtered.groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="total_count")
     delay_summary_ship = total_by_ship.merge(delay_by_ship, on="shipping_mode", how="left").fillna(0)
     delay_summary_ship["delay_pct"] = (delay_summary_ship["delay_count"] / delay_summary_ship["total_count"]) * 100

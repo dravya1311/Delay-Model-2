@@ -47,7 +47,7 @@ def try_load(path_or_url):
 # Auto-load file (local first, then GitHub raw)
 # ----------------------
 LOCAL_NAME = "Delay_Model.csv"
-GITHUB_RAW = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay_Model.csv"
+GITHUB_RAW = "https://raw.githubusercontent.com/dravya1311/Delay-Model-2/main/Delay_Model.csv"
 
 df = try_load(LOCAL_NAME)
 if df is None:
@@ -243,11 +243,11 @@ st.markdown("---")
 # ----------------------
 # Delay analysis: counts and percentages
 # ----------------------
-st.header("Delay Analysis (label = 1 → delayed)")
+st.header("Delay Analysis (label = -1 → delayed)")
 
 # Delay by shipping_mode
 if "shipping_mode" in filtered.columns and "label" in filtered.columns:
-    delay_by_ship = filtered[filtered["label"] == 1].groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="delay_count")
+    delay_by_ship = filtered[filtered["label"] == -1].groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="delay_count")
     total_by_ship = filtered.groupby("shipping_mode", dropna=False)["label"].count().reset_index(name="total_count")
     delay_summary_ship = total_by_ship.merge(delay_by_ship, on="shipping_mode", how="left").fillna(0)
     delay_summary_ship["delay_pct"] = (delay_summary_ship["delay_count"] / delay_summary_ship["total_count"]) * 100

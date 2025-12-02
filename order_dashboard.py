@@ -281,7 +281,14 @@ else:
 # -------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
 # Combine origin and destination
-st.write("COLUMNS:", df_view.columns.tolist())
+# --------------------------------------------
+# DEBUG: Display actual column names
+# --------------------------------------------
+st.write("DEBUG: Columns available →", df_view.columns.tolist())
+
+# STOP execution so you can see the output
+st.stop()
+
 
 df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
 df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)

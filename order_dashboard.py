@@ -122,6 +122,12 @@ st.markdown("---")
 # ----------------------
 st.sidebar.header("Filters")
 regions = sorted(work["order_region"].dropna().unique()) if "order_region" in work.columns else []
+# ------------------------------
+# DEBUG: Check column names
+# ------------------------------
+st.write("DEBUG: Columns available →", df_view.columns.tolist())
+st.stop()
+
 ships = sorted(work["shipping_mode"].dropna().unique()) if "shipping_mode" in work.columns else []
 
 sel_regions = st.sidebar.multiselect("Filter: Order Region", options=regions, default=regions)
@@ -320,8 +326,6 @@ fig_routes.update_layout(yaxis_title="Route (Origin)", xaxis_title="Avg Delay Sc
 st.plotly_chart(fig_routes, use_container_width=True)
 
 
-st.markdown("---")
-st.success("Dashboard ready. Export or share this link with stakeholders.")
 
 st.markdown("---")
 st.success("Dashboard ready. Export or share this link with stakeholders.")

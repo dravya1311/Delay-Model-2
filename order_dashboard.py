@@ -276,5 +276,45 @@ if "order_region" in filtered.columns and "label" in filtered.columns:
 else:
     st.info("order_region or label missing; skipping delay by region")
 
+# --------------------------------------------
+# KPI: Top 10 Most Delayed Lanes (Origin → Destination)
+# --------------------------------------------
+
+st.subheader("Top 10 Most Delayed Lanes (Origin → Destination)")
+
+# Create lane columns
+df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
+df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
+
+# Compute average delay score per lane
+lane_delay = (
+    df_view.groupby(["origin", "destination"])["label"]
+    .mean()
+    .reset_index(name="avg_delay_score")
+    .sort_values("avg_delay_score")   # ascending → most delayed first
+)
+
+# Top 10 most delayed lanes
+top10_lanes = lane_delay.head(10)
+
+if not top10_lanes.empty:
+    fig_lane = px.bar(
+        top10_lanes,
+        x="avg_delay_score",
+        y=top10_lanes["origin"] + " → " + top10_lanes["destination"],
+        orientation="h",
+        title="Top 10 Most Delayed Lanes (Lower Score = More Delayed)",
+        labels={"avg_delay_score": "Avg Delay Score", "y": "Lane"},
+    )
+
+    # data labels (2 decimals)
+    fig_lane.update_traces(text=top10_lanes["avg_delay_score"].round(2),
+                           textposition="outside")
+
+    st.plotly_chart(fig_lane, use_container_width=True)
+else:
+    st.info("Not enough data to compute delayed lanes.")
+
+
 st.markdown("---")
 st.success("Dashboard ready. Export or share this link with stakeholders.")

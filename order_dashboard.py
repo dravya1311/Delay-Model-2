@@ -277,40 +277,6 @@ else:
     st.info("order_region or label missing; skipping delay by region")
 
 # --------------------------------------------
-# KPI: Top 10 Most Delayed Lanes (Origin → Destination)
-# --------------------------------------------
-
-st.subheader("Top 10 Most Delayed Lanes (Origin → Destination)")
-
-# Create lane columns
-df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
-df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
-
-# Compute average delay score per lane
-lane_delay = (
-    df_view.groupby(["origin", "destination"])["label"]
-    .mean()
-    .reset_index(name="avg_delay_score")
-    .sort_values("avg_delay_score")   # ascending → most delayed first
-)
-
-# -------------------------------------------------------------
-# KPI: Top 10 Most Delayed Routes (Origin → Destination)
-# -------------------------------------------------------------
-st.subheader("Top 10 Most Delayed Routes")
-
-# Build Origin & Destination
-df_view["origin"] = df_view["Order city"].astype(str) + ", " + df_view["Order Country"].astype(str)
-df_view["destination"] = df_view["Customer city"].astype(str) + ", " + df_view["Customer Country"].astype(str)
-
-# Compute delay rate
-route_grp = (
-    df_view.groupby(["origin", "destination"])["label"]
-    .apply(lambda x: (x == -1).mean() * 100)
-    .reset_index(name="delay_rate")
-)
-
-# -------------------------------------------------------------
 # KPI: Top 10 Most Delayed Routes (Origin → Destination)
 # -------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
@@ -353,7 +319,6 @@ fig_routes.update_layout(
 )
 
 st.plotly_chart(fig_routes, use_container_width=True)
-
 
 
 st.markdown("---")

@@ -102,18 +102,18 @@ for col in ("sales","profit_per_order","quantity"):
 # Dashboard header & top KPIs
 # ----------------------
 st.title("📊 Order Delay Analysis Dashboard")
-st.markdown("**Delay labeling:** `1 = delayed`, `0 = on-time`, `-1 = early`")
+st.markdown("**Delay labeling:** `-1 = delayed`, `0 = on-time`, `1 = early`")
 
 total_orders = len(work)
-delayed_count = int((work["label"] == 1).sum()) if "label" in work.columns else 0
+delayed_count = int((work["label"] == -1).sum()) if "label" in work.columns else 0
 ontime_count = int((work["label"] == 0).sum()) if "label" in work.columns else 0
-early_count = int((work["label"] == -1).sum()) if "label" in work.columns else 0
+early_count = int((work["label"] == 1).sum()) if "label" in work.columns else 0
 
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("Total orders", f"{total_orders:,}")
-k2.metric("Delayed orders (label=1)", f"{delayed_count:,}")
+k2.metric("Delayed orders (label=-1)", f"{delayed_count:,}")
 k3.metric("On-time orders (label=0)", f"{ontime_count:,}")
-k4.metric("Early deliveries (label=-1)", f"{early_count:,}")
+k4.metric("Early deliveries (label=1)", f"{early_count:,}")
 
 st.markdown("---")
 
@@ -149,10 +149,10 @@ if "profit_per_order" in filtered.columns:
 else:
     avg_profit = pd.DataFrame(columns=["order_region","avg_profit"])
 
-cols[0].subheader("Average Sales per Customer (by Region)")
+cols[0].subheader("Average Sales per Customer in US dollars (by Region)")
 cols[0].dataframe(avg_sales.sort_values("avg_sales", ascending=False), use_container_width=True)
 
-cols[1].subheader("Average Profit per Order (by Region)")
+cols[1].subheader("Average Profit per Order in US dollars (by Region)")
 cols[1].dataframe(avg_profit.sort_values("avg_profit", ascending=False), use_container_width=True)
 
 st.markdown("---")
@@ -243,7 +243,7 @@ st.markdown("---")
 # ----------------------
 # Delay analysis: counts and percentages
 # ----------------------
-st.header("Delay Analysis (label = 1 → delayed)")
+st.header("Delay Analysis (label = -1 → delayed)")
 
 # Delay by shipping_mode
 if "shipping_mode" in filtered.columns and "label" in filtered.columns:
@@ -266,7 +266,7 @@ else:
 # Delay by order_region + percentage
 if "order_region" in filtered.columns and "label" in filtered.columns:
     total_by_region = filtered.groupby("order_region", dropna=False)["label"].count().reset_index(name="total_count")
-    delayed_by_region = filtered[filtered["label"] == 1].groupby("order_region", dropna=False)["label"].count().reset_index(name="delay_count")
+    delayed_by_region = filtered[filtered["label"] == -1].groupby("order_region", dropna=False)["label"].count().reset_index(name="delay_count")
     delay_summary_region = total_by_region.merge(delayed_by_region, on="order_region", how="left").fillna(0)
     delay_summary_region["delay_pct"] = (delay_summary_region["delay_count"] / delay_summary_region["total_count"]) * 100
     delay_summary_region = delay_summary_region.sort_values("delay_count", ascending=False)

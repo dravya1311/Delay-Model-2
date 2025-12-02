@@ -280,8 +280,8 @@ else:
 # NEW KPI + GRAPH → Top 10 Most Delayed Routes
 # -------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
-
 # Combine origin and destination
+st.write("COLUMNS:", df_view.columns.tolist())
 df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
 df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
 

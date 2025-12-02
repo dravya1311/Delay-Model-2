@@ -277,47 +277,38 @@ else:
     st.info("order_region or label missing; skipping delay by region")
 
 # --------------------------------------------
-# KPI: Top 10 Most Delayed Routes (Origin → Destination)
+# NEW KPI + GRAPH → Top 10 Most Delayed Routes
 # -------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
 
-# Build Origin & Destination using normalized column names
+# Combine origin and destination
 df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
 df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
 
-# Compute delay rate (% of -1 labels)
-route_grp = (
+# Compute average delay (-1 delayed, 0 on-time, 1 early)
+route_delay = (
     df_view.groupby(["origin", "destination"])["label"]
-    .apply(lambda x: (x == -1).mean() * 100)
-    .reset_index(name="delay_rate")
+    .mean()
+    .reset_index()
+    .rename(columns={"label": "avg_delay"})
 )
 
-# Top 10 delayed routes
-top10_routes = route_grp.sort_values("delay_rate", ascending=False).head(10)
+# We want MOST delayed → lowest avg_delay (closest to -1)
+top10_routes = route_delay.nsmallest(10, "avg_delay")
 
-# Horizontal bar chart
+# Plot
 fig_routes = px.bar(
     top10_routes,
-    x="delay_rate",
+    x="avg_delay",
     y="origin",
-    color="delay_rate",
+    color="avg_delay",
     orientation="h",
-    title="Top 10 Most Delayed Shipping Routes",
+    title="Top 10 Most Delayed Origin–Destination Routes",
+    text=top10_routes["avg_delay"].round(2)
 )
 
-# Data labels (2 decimals)
-fig_routes.update_traces(
-    text=top10_routes["delay_rate"].map(lambda x: f"{x:.2f}%"),
-    textposition="inside"
-)
-
-fig_routes.update_layout(
-    xaxis_title="Delay Rate (%)",
-    yaxis_title="Route (Origin → Destination)",
-    coloraxis_showscale=False,
-    height=500
-)
-
+fig_routes.update_traces(textposition="outside")
+fig_routes.update_layout(yaxis_title="Route (Origin)", xaxis_title="Avg Delay Score (-1 worst)")
 st.plotly_chart(fig_routes, use_container_width=True)
 
 

@@ -310,10 +310,26 @@ route_grp = (
     .reset_index(name="delay_rate")
 )
 
-# Top 10 delayed
+# -------------------------------------------------------------
+# KPI: Top 10 Most Delayed Routes (Origin → Destination)
+# -------------------------------------------------------------
+st.subheader("Top 10 Most Delayed Routes")
+
+# Build Origin & Destination using normalized column names
+df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
+df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
+
+# Compute delay rate (% of -1 labels)
+route_grp = (
+    df_view.groupby(["origin", "destination"])["label"]
+    .apply(lambda x: (x == -1).mean() * 100)
+    .reset_index(name="delay_rate")
+)
+
+# Top 10 delayed routes
 top10_routes = route_grp.sort_values("delay_rate", ascending=False).head(10)
 
-# Bar chart
+# Horizontal bar chart
 fig_routes = px.bar(
     top10_routes,
     x="delay_rate",
@@ -323,7 +339,7 @@ fig_routes = px.bar(
     title="Top 10 Most Delayed Shipping Routes",
 )
 
-# Add data labels
+# Data labels (2 decimals)
 fig_routes.update_traces(
     text=top10_routes["delay_rate"].map(lambda x: f"{x:.2f}%"),
     textposition="inside"
@@ -337,6 +353,7 @@ fig_routes.update_layout(
 )
 
 st.plotly_chart(fig_routes, use_container_width=True)
+
 
 
 st.markdown("---")

@@ -294,26 +294,49 @@ lane_delay = (
     .sort_values("avg_delay_score")   # ascending → most delayed first
 )
 
-# Top 10 most delayed lanes
-top10_lanes = lane_delay.head(10)
+# -------------------------------------------------------------
+# KPI: Top 10 Most Delayed Routes (Origin → Destination)
+# -------------------------------------------------------------
+st.subheader("Top 10 Most Delayed Routes")
 
-if not top10_lanes.empty:
-    fig_lane = px.bar(
-        top10_lanes,
-        x="avg_delay_score",
-        y=top10_lanes["origin"] + " → " + top10_lanes["destination"],
-        orientation="h",
-        title="Top 10 Most Delayed Lanes (Lower Score = More Delayed)",
-        labels={"avg_delay_score": "Avg Delay Score", "y": "Lane"},
-    )
+# Build Origin & Destination
+df_view["origin"] = df_view["Order city"].astype(str) + ", " + df_view["Order Country"].astype(str)
+df_view["destination"] = df_view["Customer city"].astype(str) + ", " + df_view["Customer Country"].astype(str)
 
-    # data labels (2 decimals)
-    fig_lane.update_traces(text=top10_lanes["avg_delay_score"].round(2),
-                           textposition="outside")
+# Compute delay rate
+route_grp = (
+    df_view.groupby(["origin", "destination"])["label"]
+    .apply(lambda x: (x == -1).mean() * 100)
+    .reset_index(name="delay_rate")
+)
 
-    st.plotly_chart(fig_lane, use_container_width=True)
-else:
-    st.info("Not enough data to compute delayed lanes.")
+# Top 10 delayed
+top10_routes = route_grp.sort_values("delay_rate", ascending=False).head(10)
+
+# Bar chart
+fig_routes = px.bar(
+    top10_routes,
+    x="delay_rate",
+    y="origin",
+    color="delay_rate",
+    orientation="h",
+    title="Top 10 Most Delayed Shipping Routes",
+)
+
+# Add data labels
+fig_routes.update_traces(
+    text=top10_routes["delay_rate"].map(lambda x: f"{x:.2f}%"),
+    textposition="inside"
+)
+
+fig_routes.update_layout(
+    xaxis_title="Delay Rate (%)",
+    yaxis_title="Route (Origin → Destination)",
+    coloraxis_showscale=False,
+    height=500
+)
+
+st.plotly_chart(fig_routes, use_container_width=True)
 
 
 st.markdown("---")

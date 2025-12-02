@@ -281,6 +281,7 @@ else:
 # -------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
 # Combine origin and destination
+st.write("COLUMNS:", df_view.columns.tolist())
 
 df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
 df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
@@ -311,6 +312,9 @@ fig_routes.update_traces(textposition="outside")
 fig_routes.update_layout(yaxis_title="Route (Origin)", xaxis_title="Avg Delay Score (-1 worst)")
 st.plotly_chart(fig_routes, use_container_width=True)
 
+
+st.markdown("---")
+st.success("Dashboard ready. Export or share this link with stakeholders.")
 
 st.markdown("---")
 st.success("Dashboard ready. Export or share this link with stakeholders.")

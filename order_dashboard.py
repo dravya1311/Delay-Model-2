@@ -279,12 +279,13 @@ else:
 
 # --------------------------------------------
 # ---------------------------------------------------------------
+# ---------------------------------------------------------------
 # KPI: Delay breakup by order-region for STANDARD CLASS only
 # ---------------------------------------------------------------
 st.subheader("Delay Breakup by Order-Region (Standard Class)")
 
-# Filter only Standard Class
-std_df = df_view[df_view["shipping_mode"] == "Standard Class"].copy()
+# Use filtered dataframe instead of df_view
+std_df = filtered[filtered["shipping_mode"] == "Standard Class"].copy()
 
 # Identify delayed orders (label = -1)
 std_df["is_delayed"] = std_df["label"] == -1
@@ -314,7 +315,3 @@ fig_std_delay.update_layout(
 )
 
 st.plotly_chart(fig_std_delay, use_container_width=True)
-
-
-st.markdown("---")
-st.success("Dashboard ready. Export or share this link with stakeholders.")

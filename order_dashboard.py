@@ -316,13 +316,15 @@ fig_std_delay.update_layout(
 
 st.plotly_chart(fig_std_delay, use_container_width=True)
 # ---------------------------------------------------------------
+# ---------------------------------------------------------------
 # KPI: Top 10 Most Delayed Routes (Delay Percentage)
 # ---------------------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes (by Delay %)")
 
-# Ensure required columns exist
-req_cols = ["order_city", "order_country", "customer_city",
-            "customer_country", "label"]
+# Map correct column names
+req_cols = ["Order city", "Order Country", "Customer city",
+            "Customer Country", "label"]
+
 for c in req_cols:
     if c not in filtered.columns:
         st.error(f"Missing required column: {c}")
@@ -330,14 +332,14 @@ for c in req_cols:
 
 # Build origin & destination
 filtered["origin"] = (
-    filtered["order_city"].astype(str) + ", " + filtered["order_country"].astype(str)
+    filtered["Order city"].astype(str) + ", " + filtered["Order Country"].astype(str)
 )
 
 filtered["destination"] = (
-    filtered["customer_city"].astype(str) + ", " + filtered["customer_country"].astype(str)
+    filtered["Customer city"].astype(str) + ", " + filtered["Customer Country"].astype(str)
 )
 
-# Identify delayed orders
+# Identify delayed orders (-1 = delayed)
 filtered["is_delayed"] = filtered["label"] == -1
 
 # Group by route
@@ -350,14 +352,14 @@ route_grp = (
     .reset_index()
 )
 
-# Calculate delay percentage
+# Compute delay %
 route_grp["delay_pct"] = (route_grp["delayed_orders"] /
                           route_grp["total_orders"]) * 100
 
-# Get top 10 most delayed (highest delay%)
+# Top 10 delayed
 top10_routes = route_grp.nlargest(10, "delay_pct")
 
-# Plot graph
+# Plot
 fig_routes = px.bar(
     top10_routes,
     x="delay_pct",
@@ -370,9 +372,8 @@ fig_routes = px.bar(
 
 fig_routes.update_traces(textposition="outside")
 fig_routes.update_layout(
-    xaxis_title="Delay % (Higher is Worse)",
-    yaxis_title="Origin",
+    xaxis_title="Delay % (Higher means worse delay)",
+    yaxis_title="Origin"
 )
 
 st.plotly_chart(fig_routes, use_container_width=True)
-

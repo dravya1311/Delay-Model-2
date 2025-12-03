@@ -132,10 +132,7 @@ if "order_region" in filtered.columns and sel_regions:
 if "shipping_mode" in filtered.columns and sel_shipping:
     filtered = filtered[filtered["shipping_mode"].isin(sel_shipping)]
     # ------------------------------
-# DEBUG: Check column names
-# ------------------------------
-st.write("DEBUG: Columns available →", df_view.columns.tolist())
-st.stop()
+
 
 # ----------------------
 # KPI panels by region (avg sales, avg profit)

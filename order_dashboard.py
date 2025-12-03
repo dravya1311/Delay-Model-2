@@ -281,48 +281,42 @@ else:
     st.info("order_region or label missing; skipping delay by region")
 
 # --------------------------------------------
-# NEW KPI + GRAPH → Top 10 Most Delayed Routes
-# -------------------------------------------------------------
-st.subheader("Top 10 Most Delayed Routes")
-# Combine origin and destination
-# --------------------------------------------
-# DEBUG: Display actual column names
-# --------------------------------------------
-st.write("DEBUG: Columns available →", df_view.columns.tolist())
+# ---------------------------------------------------------------
+# KPI: Delay breakup by order-region for STANDARD CLASS only
+# ---------------------------------------------------------------
+st.subheader("Delay Breakup by Order-Region (Standard Class)")
 
-# STOP execution so you can see the output
-st.stop()
+# Filter only Standard Class
+std_df = df_view[df_view["shipping_mode"] == "Standard Class"].copy()
 
+# Identify delayed orders (label = -1)
+std_df["is_delayed"] = std_df["label"] == -1
 
-df_view["origin"] = df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
-df_view["destination"] = df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
-
-# Compute average delay (-1 delayed, 0 on-time, 1 early)
-route_delay = (
-    df_view.groupby(["origin", "destination"])["label"]
+# Group by region
+delay_region_std = (
+    std_df.groupby("order_region")["is_delayed"]
     .mean()
     .reset_index()
-    .rename(columns={"label": "avg_delay"})
+    .rename(columns={"is_delayed": "delay_rate"})
 )
 
-# We want MOST delayed → lowest avg_delay (closest to -1)
-top10_routes = route_delay.nsmallest(10, "avg_delay")
-
-# Plot
-fig_routes = px.bar(
-    top10_routes,
-    x="avg_delay",
-    y="origin",
-    color="avg_delay",
-    orientation="h",
-    title="Top 10 Most Delayed Origin–Destination Routes",
-    text=top10_routes["avg_delay"].round(2)
+# Graph
+fig_std_delay = px.bar(
+    delay_region_std,
+    x="order_region",
+    y="delay_rate",
+    text=delay_region_std["delay_rate"].round(2),
+    title="Delay % by Order-Region — Standard Class",
+    color="delay_rate"
 )
 
-fig_routes.update_traces(textposition="outside")
-fig_routes.update_layout(yaxis_title="Route (Origin)", xaxis_title="Avg Delay Score (-1 worst)")
-st.plotly_chart(fig_routes, use_container_width=True)
+fig_std_delay.update_traces(textposition="outside")
+fig_std_delay.update_layout(
+    yaxis_title="Delay Rate (0 = none, 1 = fully delayed)",
+    xaxis_title="Order Region"
+)
 
+st.plotly_chart(fig_std_delay, use_container_width=True)
 
 
 st.markdown("---")

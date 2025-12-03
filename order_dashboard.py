@@ -316,64 +316,46 @@ fig_std_delay.update_layout(
 
 st.plotly_chart(fig_std_delay, use_container_width=True)
 # ---------------------------------------------------------------
-# ---------------------------------------------------------------
-# KPI: Top 10 Most Delayed Routes (Delay Percentage)
-# ---------------------------------------------------------------
-st.subheader("Top 10 Most Delayed Routes (by Delay %)")
+# -------------------------------------------------------------
+# KPI: Top 10 Most Delayed Routes (Uses normalized column names)
+# -------------------------------------------------------------
+st.subheader("Top 10 Most Delayed Routes")
 
-# Map correct column names
-req_cols = ["Order city", "Order Country", "Customer city",
-            "Customer Country", "label"]
-
-for c in req_cols:
-    if c not in filtered.columns:
-        st.error(f"Missing required column: {c}")
-        st.stop()
-
-# Build origin & destination
-filtered["origin"] = (
-    filtered["Order city"].astype(str) + ", " + filtered["Order Country"].astype(str)
+# Origin & Destination
+df_view["origin"] = (
+    df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
 )
 
-filtered["destination"] = (
-    filtered["Customer city"].astype(str) + ", " + filtered["Customer Country"].astype(str)
+df_view["destination"] = (
+    df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
 )
 
-# Identify delayed orders (-1 = delayed)
-filtered["is_delayed"] = filtered["label"] == -1
-
-# Group by route
-route_grp = (
-    filtered.groupby(["origin", "destination"])
-    .agg(
-        total_orders=("label", "count"),
-        delayed_orders=("is_delayed", "sum")
-    )
+# Compute average delay score (-1 delayed, 0 on-time, +1 early)
+route_delay = (
+    df_view.groupby(["origin", "destination"])["label"]
+    .mean()
     .reset_index()
+    .rename(columns={"label": "avg_delay"})
 )
 
-# Compute delay %
-route_grp["delay_pct"] = (route_grp["delayed_orders"] /
-                          route_grp["total_orders"]) * 100
-
-# Top 10 delayed
-top10_routes = route_grp.nlargest(10, "delay_pct")
+# Show most delayed → lowest avg_delay
+top10_routes = route_delay.nsmallest(10, "avg_delay")
 
 # Plot
 fig_routes = px.bar(
     top10_routes,
-    x="delay_pct",
+    x="avg_delay",
     y="origin",
-    color="delay_pct",
     orientation="h",
-    text=top10_routes["delay_pct"].round(2),
-    title="Top 10 Most Delayed Routes (by Delay %)",
+    color="avg_delay",
+    title="Top 10 Most Delayed Origin–Destination Routes",
+    text=top10_routes["avg_delay"].round(2)
 )
 
 fig_routes.update_traces(textposition="outside")
 fig_routes.update_layout(
-    xaxis_title="Delay % (Higher means worse delay)",
-    yaxis_title="Origin"
+    yaxis_title="Route (Origin → Destination)",
+    xaxis_title="Avg Delay Score (-1 = Worst)"
 )
 
 st.plotly_chart(fig_routes, use_container_width=True)

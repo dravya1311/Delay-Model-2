@@ -323,11 +323,11 @@ st.subheader("Top 10 Most Delayed Routes")
 
 # Origin & Destination
 filtered["origin"] = (
-    filtered["Order_city"].astype(str) + ", " + filtered["Order_Country"].astype(str)
+    filtered["order_city"].astype(str) + ", " + filtered["order_country"].astype(str)
 )
 
 filtered["destination"] = (
-    filtered["Customer_city"].astype(str) + ", " + filtered["Customer_Country"].astype(str)
+    filtered["customer_city"].astype(str) + ", " + filtered["customer_country"].astype(str)
 )
 
 # Compute average delay score (-1 delayed, 0 on-time, +1 early)

@@ -323,11 +323,11 @@ st.subheader("Top 10 Most Delayed Routes")
 
 # Origin & Destination
 df_view["origin"] = (
-    df_view["order_city"].astype(str) + ", " + df_view["order_country"].astype(str)
+    df_view["Order_city"].astype(str) + ", " + df_view["Order_Country"].astype(str)
 )
 
 df_view["destination"] = (
-    df_view["customer_city"].astype(str) + ", " + df_view["customer_country"].astype(str)
+    df_view["Customer_city"].astype(str) + ", " + df_view["Customer_Country"].astype(str)
 )
 
 # Compute average delay score (-1 delayed, 0 on-time, +1 early)

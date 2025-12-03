@@ -322,17 +322,17 @@ st.plotly_chart(fig_std_delay, use_container_width=True)
 st.subheader("Top 10 Most Delayed Routes")
 
 # Origin & Destination
-df_view["origin"] = (
-    df_view["Order_city"].astype(str) + ", " + df_view["Order_Country"].astype(str)
+filtered["origin"] = (
+    filtered["Order_city"].astype(str) + ", " + filtered["Order_Country"].astype(str)
 )
 
-df_view["destination"] = (
-    df_view["Customer_city"].astype(str) + ", " + df_view["Customer_Country"].astype(str)
+filtered["destination"] = (
+    filtered["Customer_city"].astype(str) + ", " + filtered["Customer_Country"].astype(str)
 )
 
 # Compute average delay score (-1 delayed, 0 on-time, +1 early)
 route_delay = (
-    df_view.groupby(["origin", "destination"])["label"]
+   filtered.groupby(["origin", "destination"])["label"]
     .mean()
     .reset_index()
     .rename(columns={"label": "avg_delay"})

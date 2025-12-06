@@ -322,7 +322,7 @@ st.plotly_chart(fig_std_delay, use_container_width=True)
 
 # Average delay score per product
 prod_delay = (
-    df_view.groupby("product_name")["label"]
+    filtered.groupby("product_name")["label"]
     .mean()
     .reset_index()
     .rename(columns={"label": "avg_delay"})

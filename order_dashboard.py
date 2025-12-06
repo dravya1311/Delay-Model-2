@@ -317,45 +317,36 @@ fig_std_delay.update_layout(
 st.plotly_chart(fig_std_delay, use_container_width=True)
 # ---------------------------------------------------------------
 # -------------------------------------------------------------
-# KPI: Top 10 Most Delayed Routes (Uses normalized column names)
+# KPI: 10 Most Delayed Products
 # -------------------------------------------------------------
-st.subheader("Top 10 Most Delayed Routes")
 
-# Origin & Destination
-filtered["origin"] = (
-    filtered["order_city"].astype(str) + ", " + filtered["order_country"].astype(str)
-)
-
-filtered["destination"] = (
-    filtered["customer_city"].astype(str) + ", " + filtered["customer_country"].astype(str)
-)
-
-# Compute average delay score (-1 delayed, 0 on-time, +1 early)
-route_delay = (
-   filtered.groupby(["origin", "destination"])["label"]
+# Average delay score per product
+prod_delay = (
+    df_view.groupby("product_name")["label"]
     .mean()
     .reset_index()
     .rename(columns={"label": "avg_delay"})
 )
 
-# Show most delayed → lowest avg_delay
-top10_routes = route_delay.nsmallest(10, "avg_delay")
+# Select most delayed → lowest average delay (closest to -1)
+top10_delayed_products = prod_delay.nsmallest(10, "avg_delay")
 
 # Plot
-fig_routes = px.bar(
-    top10_routes,
+fig_prod = px.bar(
+    top10_delayed_products,
     x="avg_delay",
-    y="origin",
+    y="product_name",
     orientation="h",
     color="avg_delay",
-    title="Top 10 Most Delayed Origin–Destination Routes",
-    text=top10_routes["avg_delay"].round(2)
+    title="Top 10 Most Delayed Products",
+    text=top10_delayed_products["avg_delay"].round(2)
 )
 
-fig_routes.update_traces(textposition="outside")
-fig_routes.update_layout(
-    yaxis_title="Route (Origin → Destination)",
-    xaxis_title="Avg Delay Score (-1 = Worst)"
+fig_prod.update_traces(textposition="outside")
+fig_prod.update_layout(
+    xaxis_title="Avg Delay Score (-1 = Worst)",
+    yaxis_title="Product"
 )
 
-st.plotly_chart(fig_routes, use_container_width=True)
+st.plotly_chart(fig_prod, use_container_width=True)
+

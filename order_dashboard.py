@@ -350,27 +350,38 @@ fig_prod.update_layout(
 
 st.plotly_chart(fig_prod, use_container_width=True)
 
-# Order Status Percentage
-
 import pandas as pd
+import plotly.express as px
+import streamlit as st
 
 # Load file
 df = pd.read_csv("Delay_Model.csv")
 
-# Ensure column exists
-if "order_status" not in df.columns:
-    raise ValueError("Missing required column: order_status")
+# Validate column
+required_col = "order_status"
+if required_col not in df.columns:
+    st.error(f"Missing required column: {required_col}")
+    st.stop()
 
 # Calculate percentage distribution
-status_count = df["order_status"].value_counts(dropna=False)
-status_percent = (status_count / len(df)) * 100
+status_pct = (
+    df[required_col]
+    .value_counts(normalize=True) * 100
+).reset_index()
 
-# Create a summary dataframe
-order_status_summary = pd.DataFrame({
-    "Order Status": status_count.index,
-    "Count": status_count.values,
-    "Percentage": status_percent.round(2)
-})
+status_pct.columns = ["order_status", "percentage"]
 
-print(order_status_summary)
+# Display KPI Table
+st.subheader("Order Status Breakdown (%)")
+st.dataframe(status_pct)
 
+# Pie Chart
+fig = px.pie(
+    status_pct,
+    names="order_status",
+    values="percentage",
+    title="Order Status Distribution",
+    hole=0.4
+)
+
+st.plotly_chart(fig, use_container_width=True)

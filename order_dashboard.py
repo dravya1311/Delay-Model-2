@@ -371,10 +371,6 @@ status_pct = (
 
 status_pct.columns = ["order_status", "percentage"]
 
-# Display KPI Table
-st.subheader("Order Status Breakdown (%)")
-st.dataframe(status_pct)
-
 # Pie Chart
 fig = px.pie(
     status_pct,

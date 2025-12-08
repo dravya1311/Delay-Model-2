@@ -158,30 +158,6 @@ cols[1].dataframe(avg_profit.sort_values("avg_profit", ascending=False), use_con
 
 st.markdown("---")
 
-# Order Status Percentage
-
-import pandas as pd
-
-# Load file
-df = pd.read_csv("Delay_Model.csv")
-
-# Ensure column exists
-if "order_status" not in df.columns:
-    raise ValueError("Missing required column: order_status")
-
-# Calculate percentage distribution
-status_count = df["order_status"].value_counts(dropna=False)
-status_percent = (status_count / len(df)) * 100
-
-# Create a summary dataframe
-order_status_summary = pd.DataFrame({
-    "Order Status": status_count.index,
-    "Count": status_count.values,
-    "Percentage": status_percent.round(2)
-})
-
-print(order_status_summary)
-
 # ----------------------
 # Top 5 countries and regions
 # ----------------------
@@ -373,4 +349,28 @@ fig_prod.update_layout(
 )
 
 st.plotly_chart(fig_prod, use_container_width=True)
+
+# Order Status Percentage
+
+import pandas as pd
+
+# Load file
+df = pd.read_csv("Delay_Model.csv")
+
+# Ensure column exists
+if "order_status" not in df.columns:
+    raise ValueError("Missing required column: order_status")
+
+# Calculate percentage distribution
+status_count = df["order_status"].value_counts(dropna=False)
+status_percent = (status_count / len(df)) * 100
+
+# Create a summary dataframe
+order_status_summary = pd.DataFrame({
+    "Order Status": status_count.index,
+    "Count": status_count.values,
+    "Percentage": status_percent.round(2)
+})
+
+print(order_status_summary)
 

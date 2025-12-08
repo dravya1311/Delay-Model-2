@@ -157,9 +157,9 @@ cols[1].subheader("Average Profit per Order in US dollars (by Region)")
 cols[1].dataframe(avg_profit.sort_values("avg_profit", ascending=False), use_container_width=True)
 
 st.markdown("---")
------------------------------------------------------------
+
 # Order Status Percentage
----------------------------------------------------------
+
 import pandas as pd
 
 # Load file

@@ -73,7 +73,8 @@ candidates = {
     "sales": ["sales","sales_per_customer","sales_per_order","sales_total"],
     "profit_per_order": ["profit_per_order","profit_per_order","order_profit_per_order","profit"],
     "quantity": ["order_item_quantity","quantity","order_item_qty","qty"],
-    "Customer city","Order city",
+    "Customer city":["Customer_city"],["customer city"],
+    "Order city": ["order_City"],["order city"],
     "label": ["label","order_status","delay_flag","delay_status"]
 }
 

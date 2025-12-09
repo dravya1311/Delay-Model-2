@@ -395,12 +395,12 @@ if missing:
     st.error(f"Missing required columns: {missing}")
 else:
     # Build origin and destination
-    filtered["origin"] = filtered["order city"].astype(str) + ", " + filtered["order country"].astype(str)
-    filtered["destination"] = filtered["customer city"].astype(str) + ", " + filtered["customer country"].astype(str)
+    filtered["origin"] = filtered["Order city"].astype(str) + ", " + filtered["Order country"].astype(str)
+    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["customer country"].astype(str)
 
     # Compute average delay score
     route_delay = (
-        filtered.groupby(["origin", "destination"])["label"]
+        filtered.groupby(["Order city", "Customer city"])["label"]
         .mean()
         .reset_index()
         .rename(columns={"label": "avg_delay"})
@@ -413,7 +413,7 @@ else:
     fig_routes = px.bar(
         top10_routes,
         x="avg_delay",
-        y="origin",
+        y="Order city",
         orientation="h",
         color="avg_delay",
         text=top10_routes["avg_delay"].round(2),

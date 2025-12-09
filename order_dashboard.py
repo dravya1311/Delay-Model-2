@@ -66,13 +66,14 @@ df_norm, col_map = normalize_cols(df)
 candidates = {
     "order_id": ["order_id","order id","orderid"],
     "order_region": ["order_region","order region","region"],
-    "order_country": ["order_country","order country","country"],
+    "order_country": ["order_country","order country","country","Order Country"],
     "shipping_mode": ["shipping_mode","shipping mode","shipping_mode","shippingmode"],
     "category_name": ["category_name","category name","category"],
     "product_name": ["product_name","product name","product"],
     "sales": ["sales","sales_per_customer","sales_per_order","sales_total"],
     "profit_per_order": ["profit_per_order","profit_per_order","order_profit_per_order","profit"],
     "quantity": ["order_item_quantity","quantity","order_item_qty","qty"],
+    "Customer city","Order city",
     "label": ["label","order_status","delay_flag","delay_status"]
 }
 

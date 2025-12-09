@@ -53,16 +53,6 @@ df = try_load(LOCAL_NAME)
 if df is None:
     df = try_load(GITHUB_RAW)
 
-if df is None:
-    st.error("Unable to load data. Place 'Delay_Model.csv' in repo root or ensure the GitHub raw URL is reachable.")
-    st.stop()
-
-st.write("COLUMN NAMES EXACTLY AS THEY EXIST →")
-st.write(list(df.columns))
-st.stop()
-
-['Payment type', 'Profit per order', 'Sales per customer', ..., 'Order city', 'Order Country', ...]
-
 # ----------------------
 # Normalize and map actual columns
 # ----------------------
@@ -390,50 +380,48 @@ fig = px.pie(
 
 st.plotly_chart(fig, use_container_width=True)
 
-# 10 MOST DELAYED ROUTES
-# ----------------------------------------------------
+# ---------------------------------------------------------
+# KPI: Top 10 Most Delayed Routes (Origin → Destination)
+# ---------------------------------------------------------
+
 st.subheader("Top 10 Most Delayed Routes")
 
-required_cols = {"order city", "order country", "customer city", "customer country", "label"}
+# Build origin–destination fields using your exact columns
+df_view["origin"] = (
+    df_view["Order city"].astype(str) + ", " + df_view["Order Country"].astype(str)
+)
 
-missing = required_cols - set(filtered.columns)
-if missing:
-    st.error(f"Missing required columns: {missing}")
-else:
-    # Build origin and destination
-    filtered["origin"] = filtered["Order city"].astype(str) + ", " + filtered["Order country"].astype(str)
-    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["Customer country"].astype(str)
+df_view["destination"] = (
+    df_view["Customer city"].astype(str) + ", " + df_view["Customer Country"].astype(str)
+)
 
-    # Compute average delay score
-    route_delay = (
-        filtered.groupby(["Order city", "Customer city"])["label"]
-        .mean()
-        .reset_index()
-        .rename(columns={"label": "avg_delay"})
-    )
+# Compute delay score (mean of -1,0,1)
+route_delay = (
+    df_view.groupby(["origin", "destination"])["label"]
+    .mean()
+    .reset_index()
+    .rename(columns={"label": "avg_delay"})
+)
 
-    # Most delayed → lowest avg_delay
-    top10_routes = route_delay.nsmallest(10, "avg_delay")
+# Lower avg_delay → more delayed (close to -1)
+top10_routes = route_delay.nsmallest(10, "avg_delay")
 
-    # Plot
-    fig_routes = px.bar(
-        top10_routes,
-        x="avg_delay",
-        y="Order city",
-        orientation="h",
-        color="avg_delay",
-        text=top10_routes["avg_delay"].round(2),
-        title="Top 10 Most Delayed Routes"
-    )
+# Plot graph
+fig_routes = px.bar(
+    top10_routes,
+    x="avg_delay",
+    y="origin",
+    orientation="h",
+    color="avg_delay",
+    text=top10_routes["avg_delay"].round(2),
+    title="Top 10 Most Delayed Origin → Destination Routes",
+    color_continuous_scale="Reds"
+)
 
-    fig_routes.update_traces(
-        textposition="outside",
-        texttemplate="%{text:.2f}"
-    )
+fig_routes.update_traces(textposition="outside")
+fig_routes.update_layout(
+    xaxis_title="Average Delay Score (-1 = Worst Delay)",
+    yaxis_title="Origin → Destination",
+)
 
-    fig_routes.update_layout(
-        xaxis_title="Avg Delay Score (-1 delayed)",
-        yaxis_title="Route"
-    )
-
-    st.plotly_chart(fig_routes, use_container_width=True)
+st.plotly_chart(fig_routes, use_container_width=True)

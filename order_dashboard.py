@@ -73,8 +73,8 @@ candidates = {
     "sales": ["sales","sales_per_customer","sales_per_order","sales_total"],
     "profit_per_order": ["profit_per_order","profit_per_order","order_profit_per_order","profit"],
     "quantity": ["order_item_quantity","quantity","order_item_qty","qty"],
-    "Customer city":["Customer_city","customer city"],
-    "Order city": ["order_City","order city"],
+    "Customer_city":["Customer city","customer city"],
+    "Order_city": ["Order city","order city"],
     "label": ["label","order_status","delay_flag","delay_status"]
 }
 
@@ -396,7 +396,7 @@ if missing:
 else:
     # Build origin and destination
     filtered["origin"] = filtered["Order city"].astype(str) + ", " + filtered["Order country"].astype(str)
-    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["customer country"].astype(str)
+    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["Customer country"].astype(str)
 
     # Compute average delay score
     route_delay = (

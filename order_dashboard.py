@@ -58,7 +58,7 @@ if df is None:
     st.stop()
 
 st.write("COLUMN NAMES EXACTLY AS THEY EXIST →")
-st.write(list(work.columns))
+st.write(list(df.columns))
 st.stop()
 
 ['Payment type', 'Profit per order', 'Sales per customer', ..., 'Order city', 'Order Country', ...]

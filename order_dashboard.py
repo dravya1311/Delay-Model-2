@@ -386,17 +386,17 @@ st.plotly_chart(fig, use_container_width=True)
 # ----------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
 
-required_cols = {"Order city", "Order Country", "Customer city", "Customer Country", "label"}
+required_cols = {"order city", "order country", "customer city", "customer country", "label"}
 
 missing = required_cols - set(filtered.columns)
 if missing:
     st.error(f"Missing required columns: {missing}")
 else:
-    # Build Origin + Destination
-    filtered["origin"] = filtered["Order city"].astype(str) + ", " + filtered["Order Country"].astype(str)
-    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["Customer Country"].astype(str)
+    # Build origin and destination
+    filtered["origin"] = filtered["order city"].astype(str) + ", " + filtered["order country"].astype(str)
+    filtered["destination"] = filtered["customer city"].astype(str) + ", " + filtered["customer country"].astype(str)
 
-    # Calculate mean delay score for each route
+    # Compute average delay score
     route_delay = (
         filtered.groupby(["origin", "destination"])["label"]
         .mean()
@@ -404,7 +404,7 @@ else:
         .rename(columns={"label": "avg_delay"})
     )
 
-    # Most delayed = lowest avg_delay (closest to -1)
+    # Most delayed → lowest avg_delay
     top10_routes = route_delay.nsmallest(10, "avg_delay")
 
     # Plot
@@ -414,8 +414,8 @@ else:
         y="origin",
         orientation="h",
         color="avg_delay",
-        title="Top 10 Most Delayed Routes (Origin → Destination)",
-        text=top10_routes["avg_delay"].round(2)
+        text=top10_routes["avg_delay"].round(2),
+        title="Top 10 Most Delayed Routes"
     )
 
     fig_routes.update_traces(
@@ -424,8 +424,8 @@ else:
     )
 
     fig_routes.update_layout(
-        xaxis_title="Average Delay Score (-1 = Delayed, 0 = On-time, 1 = Early)",
-        yaxis_title="Origin → Destination Route"
+        xaxis_title="Avg Delay Score (-1 delayed)",
+        yaxis_title="Route"
     )
 
     st.plotly_chart(fig_routes, use_container_width=True)

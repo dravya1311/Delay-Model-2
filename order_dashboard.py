@@ -57,6 +57,12 @@ if df is None:
     st.error("Unable to load data. Place 'Delay_Model.csv' in repo root or ensure the GitHub raw URL is reachable.")
     st.stop()
 
+st.write("COLUMN NAMES EXACTLY AS THEY EXIST →")
+st.write(list(work.columns))
+st.stop()
+
+['Payment type', 'Profit per order', 'Sales per customer', ..., 'Order city', 'Order Country', ...]
+
 # ----------------------
 # Normalize and map actual columns
 # ----------------------

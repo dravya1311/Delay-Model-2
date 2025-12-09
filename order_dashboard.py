@@ -381,23 +381,24 @@ fig = px.pie(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
 # 10 MOST DELAYED ROUTES
 # ----------------------------------------------------
 st.subheader("Top 10 Most Delayed Routes")
 
 required_cols = {"Order city", "Order Country", "Customer city", "Customer Country", "label"}
 
-missing = required_cols - set(df_view.columns)
+missing = required_cols - set(filtered.columns)
 if missing:
     st.error(f"Missing required columns: {missing}")
 else:
     # Build Origin + Destination
-    df_view["origin"] = df_view["Order city"].astype(str) + ", " + df_view["Order Country"].astype(str)
-    df_view["destination"] = df_view["Customer city"].astype(str) + ", " + df_view["Customer Country"].astype(str)
+    filtered["origin"] = filtered["Order city"].astype(str) + ", " + filtered["Order Country"].astype(str)
+    filtered["destination"] = filtered["Customer city"].astype(str) + ", " + filtered["Customer Country"].astype(str)
 
     # Calculate mean delay score for each route
     route_delay = (
-        df_view.groupby(["origin", "destination"])["label"]
+        filtered.groupby(["origin", "destination"])["label"]
         .mean()
         .reset_index()
         .rename(columns={"label": "avg_delay"})
@@ -428,4 +429,3 @@ else:
     )
 
     st.plotly_chart(fig_routes, use_container_width=True)
-

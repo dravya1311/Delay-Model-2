@@ -92,7 +92,7 @@ delay_region = (
 fig = px.bar(
     delay_region,
     x="order_region",
-    yaxis_title="Delay (%)"
+    y="Delay (%)"
    text=delay_region["delay_pct"].astype(int)
     title="Delay % by Region"
 )

@@ -85,12 +85,17 @@ st.subheader("Delay % by Region")
 
 delay_region = (
     filtered.groupby("order_region")["label"]
-    .apply(lambda x: (x == -1).mean())
+    .apply(lambda x: ((x == -1).mean() * 100).round(0))
     .reset_index(name="delay_pct")
 )
 
-fig = px.bar(delay_region, x="order_region", y="delay_pct", text_auto=True)
-st.plotly_chart(fig, use_container_width=True)
+fig = px.bar(
+    delay_region,
+    x="order_region",
+    y="delay_pct",
+    text=delay_region["delay_pct"].astype(int),
+    title="Delay % by Region"
+)
 
 # ---------------------------------------
 # SHIPPING MODE DELAY
@@ -99,7 +104,7 @@ st.subheader("Delay by Shipping Mode")
 
 delay_ship = (
     filtered.groupby("shipping_mode")["label"]
-    .apply(lambda x: (x == -1).mean())
+    .apply(lambda x: ((x == -1).mean() * 100).round(0))
     .reset_index(name="delay_pct")
 )
 
@@ -139,7 +144,7 @@ std = filtered[filtered["shipping_mode"] == "Standard Class"]
 
 std_delay = (
     std.groupby("order_region")["label"]
-    .apply(lambda x: (x == -1).mean())
+    .apply(lambda x: ((x == -1).mean() * 100).round(0))
     .reset_index(name="delay_pct")
 )
 
@@ -187,7 +192,7 @@ else:
 if "order_status" in df.columns:
     st.subheader("Order Status Distribution")
 
-    status = df["order_status"].value_counts(normalize=True) * 100
+    status = (df["order_status"].value_counts(normalize=True) * 100).round(0)
     status = status.reset_index()
     status.columns = ["status", "percentage"]
 

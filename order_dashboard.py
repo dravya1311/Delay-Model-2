@@ -113,7 +113,7 @@ st.plotly_chart(fig, use_container_width=True)
 # ---------------------------------------
 # TOP DELAYED PRODUCTS
 # ---------------------------------------
-st.subheader("Top 10 Most Delayed Products")
+st.subheader("Top 5 Most Delayed Products")
 
 prod_delay = (
     filtered.groupby("product_name")["label"]
@@ -121,7 +121,7 @@ prod_delay = (
     .reset_index()
 )
 
-top_products = prod_delay.nsmallest(10, "label")
+top_products = prod_delay.nsmallest(5, "label")
 
 fig = px.bar(
     top_products,
